@@ -1,6 +1,5 @@
 package com.example.demo.Model;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -11,7 +10,6 @@ public class User {
     @GeneratedValue
     private Long id;
     private String name;
-    private int sum;
 
     //Constructors
     protected User() {
@@ -41,14 +39,6 @@ public class User {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public int getSum() {
-        return sum;
-    }
-
-    public void setSum(int sum) {
-        this.sum = sum;
     }
 
     @Override
