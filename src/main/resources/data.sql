@@ -1,14 +1,21 @@
-DROP TABLE IF EXISTS user;
+DROP TABLE IF EXISTS users;
 
-CREATE TABLE user (
+CREATE TABLE users (
   id INT AUTO_INCREMENT  PRIMARY KEY,
-  name VARCHAR(250) NOT NULL
+  first_name VARCHAR(250) NOT NULL
 );
 
-INSERT INTO user (name) VALUES
+INSERT INTO users (first_name) VALUES
   ('Andrei'),
   ('Dan'),
   ('Dragos'),
   ('Ierdna'),
   ('Nad'),
-  ('Sogard');
+  ('Sogard'),
+  ('asfsafad'),
+  ('hfgdjfj'),
+  ('SRGJHDGDF'),
+  ('fghkuilytfdd'),
+  ('name111'),
+  ('hello'),
+  ('world');

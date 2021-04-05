@@ -1,44 +1,35 @@
 package com.example.demo.Model;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
+@Table(name = "users")
 public class User {
     @Id
     @GeneratedValue
     private Long id;
-    private String name;
+    @Column(name = "first_name", nullable = false)
+    private String firstName;
 
-    //Constructors
-    protected User() {
+    public User() {
     }
 
-    public User(Long id, String name) {
-        this.id = id;
-        this.name = name;
+    public User(String firstName) {
+        this.firstName = firstName;
     }
 
-    public User(String name) {
-        this.name = name;
-    }
-
-    //getters && setters
     public Long getId() {
         return id;
     }
-
     public void setId(Long id) {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getFirstName() {
+        return firstName;
     }
-
-    public void setName(String name) {
-        this.name = name;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
 
     @Override
@@ -57,16 +48,10 @@ public class User {
     }
 
     @Override
-    protected void finalize() throws Throwable {
-        super.finalize();
-    }
-
-    //toString
-    @Override
     public String toString() {
         return "User{" +
                 "id=" + id +
-                ", name='" + name + '\'' +
+                ", name='" + firstName + '\'' +
                 '}';
     }
 }
