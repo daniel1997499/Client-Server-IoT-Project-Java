@@ -6,16 +6,14 @@ import javax.persistence.*;
 @Table(name = "users")
 public class User {
     @Id
-    @GeneratedValue
     private Long id;
-    @Column(name = "first_name", nullable = false)
-    private String firstName;
+    private String username;
 
     public User() {
     }
 
-    public User(String firstName) {
-        this.firstName = firstName;
+    public User(String username) {
+        this.username = username;
     }
 
     public Long getId() {
@@ -25,11 +23,11 @@ public class User {
         this.id = id;
     }
 
-    public String getFirstName() {
-        return firstName;
+    public String getUsername() {
+        return username;
     }
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     @Override
@@ -51,7 +49,7 @@ public class User {
     public String toString() {
         return "User{" +
                 "id=" + id +
-                ", name='" + firstName + '\'' +
+                ", name='" + username + '\'' +
                 '}';
     }
 }
