@@ -35,6 +35,14 @@ public class Device {
         this.token = token;
     }
 
+    public Device(Device device) {
+        this.ID = device.getID();
+        this.name = device.getName();
+        this.address = device.getAddress();
+        this.token = device.getToken();
+        this.registered = device.getRegistered();
+    }
+
     public Long getID() {
         return ID;
     }

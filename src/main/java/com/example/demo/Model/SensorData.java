@@ -13,7 +13,8 @@ public class SensorData {
     private Long ID;
     @Column(name = "device_id", nullable = false)
     private Long deviceId;
-    @Column(name = "token", nullable = false)
+//    @Column(name = "token", nullable = false)
+    @Transient
     private String token;
     @Column(name = "sensor", nullable = false)
     private String sensor;
@@ -31,7 +32,6 @@ public class SensorData {
     public SensorData(Long ID, Long deviceId, String token, String sensor, String dataType, String data, Timestamp posted) {
         this.ID = ID;
         this.deviceId = deviceId;
-        this.token = token;
         this.sensor = sensor;
         this.dataType = dataType;
         this.data = data;

@@ -8,10 +8,7 @@ import com.example.demo.Security.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.regex.Pattern;
@@ -37,33 +34,32 @@ public class AppController {
     }
 
     //API POST AUTHENTICATE + GET JWT API
-    @PostMapping(value = "/authenticate", consumes = "application/json")
+    @PostMapping(value = "/authenticate", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> getToken(@RequestBody Device device) { //deviceName+IPv4Addr
         if (device.getName() != null && device.getAddress() != null
-                && Pattern.matches("\\w", device.getName()) && isValidInet4Address(device.getAddress()) // "\\W" is searching for anything except [a-zA-Z_0-9], nonWord characters
+                && !Pattern.matches("\\W", device.getName()) && isValidInet4Address(device.getAddress()) // "\\w" is searching for [a-zA-Z_0-9], nonWord characters not included
                 && devRepo.existsByName(device.getName()) && devRepo.existsByAddress(device.getAddress())) { //is present in DB
             String token = jwtTokenUtil.generateToken(device);
             List<Device> tmpDevListByName = devRepo.findDeviceByName(device.getName());
             List<Device> tmpDevListByAddress = devRepo.findDeviceByAddress(device.getAddress());
-            //TODO parse whole list to search for same value in the other list, then get ID of both and save in tmp device for later use
-            if (tmpDevListByName.get(0).getID().equals(tmpDevListByAddress.get(0).getID()))
-                device.setID(tmpDevListByName.get(0).getID());
-            device.setToken(token);
-            device.setRegistered(tmpDevListByName.get(0).getRegistered());
-            //--------------------------------------------------------------------------------------------------------------------------
+            if (tmpDevListByName.stream().findFirst().get().getID().equals(tmpDevListByAddress.stream().findFirst().get().getID())) {
+                device.setID(tmpDevListByName.stream().findFirst().get().getID());
+                device.setToken(token);
+                device.setRegistered(tmpDevListByName.stream().findFirst().get().getRegistered());
+            }
             devRepo.save(device); //we pass id so device is updated rather than saved as new
             return new ResponseEntity<>(token, HttpStatus.OK);
         }
-        else { //TODO REGISTER DEVICE AND RETURN JWT
-            System.out.println("Not in DB");
-            System.out.println(device.getName());
-            System.out.println(device.getAddress());
-            System.out.println(Pattern.matches("\\w", device.getName()));
-            System.out.println(isValidInet4Address(device.getAddress()));
-            System.out.println(devRepo.existsByName(device.getName()));
-            System.out.println(devRepo.existsByAddress(device.getAddress()));
-            System.out.println("Not in DB");
-        }
+//        else { //TODO REGISTER DEVICE AND RETURN JWT
+//            System.out.println("Not in DB");
+//            System.out.println(device.getName());
+//            System.out.println(device.getAddress());
+//            System.out.println(Pattern.matches("\\w", device.getName()));
+//            System.out.println(isValidInet4Address(device.getAddress()));
+//            System.out.println(devRepo.existsByName(device.getName()));
+//            System.out.println(devRepo.existsByAddress(device.getAddress()));
+//            System.out.println("Not in DB");
+//        }
         return new ResponseEntity<>("Bad request", HttpStatus.BAD_REQUEST);
     }
 
@@ -82,8 +78,7 @@ public class AppController {
         if (sensorData.getDeviceId() != null && sensorData.getToken() != null && sensorData.getSensor() != null && sensorData.getDataType() != null && sensorData.getData() != null
                 && devRepo.existsById(sensorData.getDeviceId())) {
             Device tmpDev = devRepo.findById(sensorData.getDeviceId()).get();
-            String token = sensorData.getToken();
-            if (jwtTokenUtil.validateToken(token, tmpDev))
+            if (jwtTokenUtil.validateToken(sensorData.getToken(), tmpDev))
                 sensorRepo.save(sensorData);
             return new ResponseEntity<>("Data Posted" , HttpStatus.OK);
         }
