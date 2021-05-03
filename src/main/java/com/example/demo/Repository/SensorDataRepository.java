@@ -9,4 +9,5 @@ public interface SensorDataRepository extends JpaRepository<SensorData, Long> {
     List<SensorData> findSensorDataBySensor(String sensor);
     List<SensorData> findSensorDataByDeviceId(Long device_id);
     List<SensorData> findSensorDataByData(String data);
+    List<SensorData> findSensorDataByDataType(String data);
 }

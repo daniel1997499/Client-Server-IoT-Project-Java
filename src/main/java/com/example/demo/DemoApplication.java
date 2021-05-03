@@ -18,7 +18,7 @@ public class DemoApplication {
 	@Bean
 	public CommandLineRunner demo(DeviceRepository devRepo) {
 		return (args) -> {
-			Device device = new Device("NodeMCU1", "192.168.100.20");
+			Device device = new Device("NodeMCU1", "192.168.100.19");
 			devRepo.save(device);
 		};
 	}

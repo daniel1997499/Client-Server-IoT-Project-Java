@@ -12,11 +12,11 @@ import java.util.Base64;
 
 public class AES256 {
     private static final String SECRET_KEY = "gfdp793-1j;dhvo[9awef]23q";
-    private static final String SALT = "ssshhhhhhhhhhh!!!!";
+    private static final String SALT = "bgsbjglapiwf734821-higoe129hsub1029uer13";
 
     public static String encrypt(String strToEncrypt) {
         try {
-            byte[] iv = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+            byte[] iv = {1, 0, 1, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0};
             IvParameterSpec ivspec = new IvParameterSpec(iv);
 
             SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
@@ -36,7 +36,7 @@ public class AES256 {
 
     public static String decrypt(String strToDecrypt) {
         try {
-            byte[] iv = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+            byte[] iv = {1, 0, 1, 0, 0, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0};
             IvParameterSpec ivspec = new IvParameterSpec(iv);
 
             SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");

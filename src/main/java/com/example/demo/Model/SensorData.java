@@ -11,10 +11,14 @@ public class SensorData {
     @Id
     @GeneratedValue
     private Long ID;
-    @Column(name = "device_id")
+    @Column(name = "device_id", nullable = false)
     private Long deviceId;
+    @Column(name = "token", nullable = false)
+    private String token;
     @Column(name = "sensor", nullable = false)
     private String sensor;
+    @Column(name = "data_type", nullable = false)
+    private String dataType; //humidity or temp or something else
     @Column(name = "data", nullable = false)
     private String data;
     @CreationTimestamp
@@ -22,6 +26,23 @@ public class SensorData {
     private Timestamp posted;
 
     public SensorData() {
+    }
+
+    public SensorData(Long ID, Long deviceId, String token, String sensor, String dataType, String data, Timestamp posted) {
+        this.ID = ID;
+        this.deviceId = deviceId;
+        this.token = token;
+        this.sensor = sensor;
+        this.dataType = dataType;
+        this.data = data;
+        this.posted = posted;
+    }
+
+    public SensorData(Long deviceId, String sensor, String dataType, String data) {
+        this.deviceId = deviceId;
+        this.sensor = sensor;
+        this.dataType = dataType;
+        this.data = data;
     }
 
     public SensorData(Long deviceId, String sensor, String data) {
@@ -46,12 +67,28 @@ public class SensorData {
         this.deviceId = deviceId;
     }
 
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
     public String getSensor() {
         return sensor;
     }
 
     public void setSensor(String sensor) {
         this.sensor = sensor;
+    }
+
+    public String getDataType() {
+        return dataType;
+    }
+
+    public void setDataType(String dataType) {
+        this.dataType = dataType;
     }
 
     public String getData() {
