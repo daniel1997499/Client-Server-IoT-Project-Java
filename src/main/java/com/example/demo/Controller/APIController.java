@@ -78,7 +78,7 @@ public class APIController {
         return new ResponseEntity<>("Bad request", HttpStatus.BAD_REQUEST);
     }
 
-    @PostMapping(value = "/sensordata", consumes = "application/json")
+    @PostMapping(value = "/sensordata", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> saveSensorData(@RequestBody SensorData sensorData) { //Long deviceID+String token+String sensor+String dataType+String data
         if (sensorData.getDeviceId() != null && sensorData.getToken() != null && sensorData.getSensor() != null && sensorData.getDataType() != null && sensorData.getData() != null
                 && devRepo.existsById(sensorData.getDeviceId())) {
@@ -87,6 +87,6 @@ public class APIController {
                 sensorRepo.save(sensorData);
             return new ResponseEntity<>("Data Posted" , HttpStatus.OK);
         }
-        return new ResponseEntity<>("Some value is null or missing or could not validate, not allowed", HttpStatus.NOT_ACCEPTABLE);
+        return new ResponseEntity<>("Some value is null or missing or could not validate, not allowed", HttpStatus.BAD_REQUEST);
     }
 }

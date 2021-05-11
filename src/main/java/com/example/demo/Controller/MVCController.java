@@ -1,37 +1,78 @@
 package com.example.demo.Controller;
 
+import com.example.demo.Model.Device;
+import com.example.demo.Model.SensorData;
 import com.example.demo.Repository.DeviceRepository;
 import com.example.demo.Repository.SensorDataRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+
+import javax.validation.Valid;
 
 @Controller
-@RequestMapping("/")
 public class MVCController {
     @Autowired
     SensorDataRepository sensorRepo;
     @Autowired
     DeviceRepository devRepo;
 
-    @GetMapping("/") //TODO ERROR HANDLING
+    @GetMapping("/**")
     public String getRoot() {
         return "redirect:/index";
     }
 
-    @GetMapping("/index") //TODO ERROR HANDLING
-    public String getIndex(@RequestParam(name="name", required=false, defaultValue="World") String name, Model model) {
-        model.addAttribute("name", name);
+    @GetMapping("/index")
+    public String getIndex() {
         return "index";
     }
 
-    @GetMapping(value = "/allsensordata") //TODO ERROR HANDLING
+    //SENSORDATA
+    @GetMapping("/allsensordata")
     public String getAllSensorData(Model model) {
-        model.addAllAttributes(sensorRepo.findAll());
+        model.addAttribute("allsensordatalist", sensorRepo.findAll());
         return "allsensordata";
+    }
+
+    @GetMapping("/addsensordata")
+    public String addSensorData(Model model) {
+        model.addAttribute("sensordata", new SensorData());
+        return "addsensordata";
+    }
+
+    @PostMapping("/savesensordata")
+    public String saveSensorData(@Valid @ModelAttribute SensorData sensorData, BindingResult result, Model model) {
+        if (result.hasErrors())
+            return "addsensordata";
+        if (sensorData.getDeviceId() != null && sensorData.getSensor() != null && sensorData.getDataType() != null && sensorData.getData() != null)
+            sensorRepo.save(sensorData);
+        return "redirect:/allsensordata";
+    }
+
+    //DEVICES
+    @GetMapping("/alldevices")
+    public String getAllDevices(Model model) {
+        model.addAttribute("alldeviceslist", devRepo.findAll());
+        return "alldevices";
+    }
+
+    @GetMapping("/addDevice")
+    public String addDevice(Model model) {
+        model.addAttribute("device", new Device());
+        return "addDevice";
+    }
+
+    @PostMapping("/saveDevice")
+    public String saveDevice(@Valid @ModelAttribute Device device, BindingResult result, Model model) {
+        if (result.hasErrors())
+            return "addDevice";
+        if (device.getName() != null && device.getAddress() != null)
+            devRepo.save(device);
+        return "redirect:/alldevices";
     }
 
 //    @GetMapping(value = "sensordata/id/{id}", produces = "application/json")

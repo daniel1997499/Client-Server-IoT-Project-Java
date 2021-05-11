@@ -3,23 +3,35 @@ package com.example.demo.Model;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.io.Serializable;
 import java.sql.Timestamp;
 
 @Entity
 @Table(name = "sensor_data")
-public class SensorData {
+public class SensorData implements Serializable {
     @Id
     @GeneratedValue
     private Long ID;
+    @NotNull
+    @Min(1)
     @Column(name = "device_id", nullable = false)
     private Long deviceId;
 //    @Column(name = "token", nullable = false)
     @Transient
     private String token;
+    @NotNull
+    @Size(min=2, max=30)
     @Column(name = "sensor", nullable = false)
     private String sensor;
+    @NotNull
+    @Size(min=2, max=30)
     @Column(name = "data_type", nullable = false)
     private String dataType; //humidity or temp or something else
+    @NotNull
+    @Size(min=2, max=30)
     @Column(name = "data", nullable = false)
     private String data;
     @CreationTimestamp
@@ -29,25 +41,10 @@ public class SensorData {
     public SensorData() {
     }
 
-    public SensorData(Long ID, Long deviceId, String token, String sensor, String dataType, String data, Timestamp posted) {
-        this.ID = ID;
-        this.deviceId = deviceId;
-        this.sensor = sensor;
-        this.dataType = dataType;
-        this.data = data;
-        this.posted = posted;
-    }
-
     public SensorData(Long deviceId, String sensor, String dataType, String data) {
         this.deviceId = deviceId;
         this.sensor = sensor;
         this.dataType = dataType;
-        this.data = data;
-    }
-
-    public SensorData(Long deviceId, String sensor, String data) {
-        this.deviceId = deviceId;
-        this.sensor = sensor;
         this.data = data;
     }
 

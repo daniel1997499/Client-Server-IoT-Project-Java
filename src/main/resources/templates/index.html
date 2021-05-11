@@ -1,12 +1,39 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
+    <title>Bootstrap Example</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-    <title>Home page</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </head>
-<body>
-<div><p th:text="'Hello, ' + ${name} + '!'" /></div>
-<div><a href="/allsensordata">All sensor data</a></div>
+<body class="text-center">
+
+<div class="jumbotron text-center">
+    <h1>Welcome</h1>
+    <p>This is the home page of the project, it is responsive</p>
+</div>
+
+<div class="container p-3 my-3 bg-light">
+    <div class="row">
+        <div class="col">
+            <div class="list-group">
+                <h3>Sensor Data</h3>
+                <a class="shadow btn btn-outline-info mt-3 text-decoration-none" href="/allsensordata">All sensor data</a>
+                <a class="shadow btn btn-outline-info mt-3 text-decoration-none" href="/addsensordata">Add sensor data</a>
+            </div>
+        </div>
+        <div class="col">
+            <div class="list-group">
+                <h3>Device Data</h3>
+                <a class="shadow btn btn-outline-info mt-3 text-decoration-none" href="/alldevices">All devices</a>
+                <a class="shadow btn btn-outline-info mt-3 text-decoration-none" href="/addDevice">Add device</a>
+            </div>
+        </div>
+    </div>
+</div>
 
 </body>
 </html>
