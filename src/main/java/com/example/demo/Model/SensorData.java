@@ -23,15 +23,15 @@ public class SensorData implements Serializable {
     @Transient
     private String token;
     @NotNull
-    @Size(min=2, max=30)
+    @Size(min=1, max=30)
     @Column(name = "sensor", nullable = false)
     private String sensor;
     @NotNull
-    @Size(min=2, max=30)
+    @Size(min=1, max=30)
     @Column(name = "data_type", nullable = false)
     private String dataType; //humidity or temp or something else
     @NotNull
-    @Size(min=2, max=30)
+    @Size(min=1, max=30)
     @Column(name = "data", nullable = false)
     private String data;
     @CreationTimestamp

@@ -4,6 +4,7 @@ import com.example.demo.Model.Device;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.impl.Base64Codec;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
@@ -18,10 +19,11 @@ public class JwtTokenUtil implements Serializable {
     public static final long JWT_TOKEN_VALIDITY = 1 * 60 * 60 * 1000; //1hour
 
 //    @Value("${jwt.secret}")
-    private String secret = "312re0dscd40=3@!#!#RASERT$T4twfdw3jrw385@";
+    private String secret = "sgfd23#@%%!f3rgt43afahrthjsdajfgj0-43sdggh4%@^$%#!@#%#^U*&&(%($@$##%&#%^U#%^rfhjkyurw2$#%^e^@$#wfg%^&ffg$&#!bf.?+)_%$@znxvcbr34";
+    Base64Codec coder = new Base64Codec();
 
     private Claims getAllClaimsFromToken(String token) {
-        return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
+        return Jwts.parser().setSigningKey(coder.encode(secret)).parseClaimsJws(token).getBody();
     }
 
     private Boolean isTokenExpired(String token) {
@@ -40,7 +42,7 @@ public class JwtTokenUtil implements Serializable {
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY))
-                .signWith(SignatureAlgorithm.HS512, secret)
+                .signWith(SignatureAlgorithm.HS512, coder.encode(secret))
                 .compact();
     }
 

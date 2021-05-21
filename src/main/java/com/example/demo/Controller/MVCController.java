@@ -8,28 +8,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
 @Controller
+@RequestMapping("/")
 public class MVCController {
     @Autowired
     SensorDataRepository sensorRepo;
     @Autowired
     DeviceRepository devRepo;
-
-    @GetMapping("/**")
-    public String getRoot() {
-        return "redirect:/index";
-    }
-
-    @GetMapping("/index")
-    public String getIndex() {
-        return "index";
-    }
 
     //SENSORDATA
     @GetMapping("/allsensordata")
@@ -40,7 +29,7 @@ public class MVCController {
 
     @GetMapping("/addsensordata")
     public String addSensorData(Model model) {
-        model.addAttribute("sensordata", new SensorData());
+        model.addAttribute("sensorData", new SensorData());
         return "addsensordata";
     }
 

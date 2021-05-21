@@ -8,18 +8,16 @@ import com.example.demo.Security.JwtTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
 @RestController
-@RequestMapping("/")
+//@RequestMapping("/")
 public class APIController {
     @Autowired
     SensorDataRepository sensorRepo;
@@ -59,15 +57,17 @@ public class APIController {
                 }
                 else { //is not present in DB
                     devRepo.save(device);
+                    //TODO Parse whole DB in search for one name and address ( select join "select from name and address where id = same")
                     List<Device> tmpDevListByName = devRepo.findDeviceByName(device.getName());
                     List<Device> tmpDevListByAddress = devRepo.findDeviceByAddress(device.getAddress());
                     if (tmpDevListByName.stream().findFirst().get().getID().equals(tmpDevListByAddress.stream().findFirst().get().getID()))
                         device.setID(tmpDevListByName.stream().findFirst().get().getID());
                     device.setRegistered(tmpDevListByName.stream().findFirst().get().getRegistered());
+
                     Map<String, Object> claims = new HashMap<>();
                     claims.put("deviceId", device.getID());
-                    claims.put("name", device.getName());
-                    claims.put("address", device.getAddress());
+                    claims.put("name", device.getName()); //TODO Give random name for security
+                    claims.put("address", device.getAddress()); //not needed
                     String token = jwtTokenUtil.generateToken(claims, device);
                     device.setToken(token);
                     devRepo.save(device);
@@ -79,13 +79,27 @@ public class APIController {
     }
 
     @PostMapping(value = "/sensordata", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> saveSensorData(@RequestBody SensorData sensorData) { //Long deviceID+String token+String sensor+String dataType+String data
+    public ResponseEntity<Object> saveSensorData(@Valid @RequestBody SensorData sensorData) { //Long deviceID+String token+String sensor+String dataType+String data
         if (sensorData.getDeviceId() != null && sensorData.getToken() != null && sensorData.getSensor() != null && sensorData.getDataType() != null && sensorData.getData() != null
                 && devRepo.existsById(sensorData.getDeviceId())) {
             Device tmpDev = devRepo.findById(sensorData.getDeviceId()).get();
             if (jwtTokenUtil.validateToken(sensorData.getToken(), tmpDev))
                 sensorRepo.save(sensorData);
             return new ResponseEntity<>("Data Posted" , HttpStatus.OK);
+        }
+        return new ResponseEntity<>("Some value is null or missing or could not validate, not allowed", HttpStatus.BAD_REQUEST);
+    }
+
+    @PostMapping(value = "/sensordatajwt", consumes = "application/json", produces = "application/json")
+    public ResponseEntity<Object> saveSensorData(@RequestHeader("Authorization") String jwt , @RequestBody SensorData sensorData) {
+        if (jwt != null) {
+            if (sensorData.getDeviceId() != null && sensorData.getToken() != null && sensorData.getSensor() != null && sensorData.getDataType() != null && sensorData.getData() != null
+                    && devRepo.existsById(sensorData.getDeviceId())) {
+                Device tmpDev = devRepo.findById(sensorData.getDeviceId()).get();
+                if (jwtTokenUtil.validateToken(jwt, tmpDev))
+                    sensorRepo.save(sensorData);
+                return new ResponseEntity<>("Data Posted" , HttpStatus.OK);
+            }
         }
         return new ResponseEntity<>("Some value is null or missing or could not validate, not allowed", HttpStatus.BAD_REQUEST);
     }

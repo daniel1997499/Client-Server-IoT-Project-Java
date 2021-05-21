@@ -64,6 +64,12 @@ public class Device implements Serializable {
         return token;
     }
 
+    public String getShortToken() {
+        if (token != null)
+            return token.substring(0,4) + "***" + token.substring(token.length()-4);
+        return "";
+    }
+
     public void setToken(String token) {
         this.token = token;
     }
