@@ -31,6 +31,12 @@ public class Device implements Serializable {
     public Device() {
     }
 
+    public Device(Long ID, String name, String address) {
+        this.ID = ID;
+        this.name = name;
+        this.address = address;
+    }
+
     public Device(String name, String address) {
         this.name = name;
         this.address = address;

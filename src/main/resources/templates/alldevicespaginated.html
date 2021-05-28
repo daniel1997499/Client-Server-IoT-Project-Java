@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>All Device Data</title>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</head>
+<body>
+
+<header th:insert="fragments/topnavbar.html :: headernavbar"> </header>
+
+<div class="jumbotron jumbotron-fluid text-center">
+    <h2>All Device Data in Database</h2>
+</div>
+<div class="container">
+    <div class="table-responsive">
+        <table class="table table-dark table-striped">
+            <thead>
+            <tr>
+                <th>Device ID</th>
+                <th>Name</th>
+                <th>Address</th>
+                <th>Token</th>
+                <th>Time Registered</th>
+                <th>Action Edit</th>
+                <th>Action Delete</th>
+            </tr>
+            </thead>
+            <tbody id="devicedatatable">
+            <tr th:each="device: ${devicesList}">
+                <td th:text="${device?.ID}" />
+                <td th:text="${device?.name}" />
+                <td th:text="${device?.address}" />
+                <td th:text="${device?.shortToken}" />
+                <td th:text="${device?.registered}" />
+                <td>
+                    <button type="button" class="btn btn-outline-primary btn-sm"
+                            data-toggle="modal"
+                            data-target="#exampleModalCenter"
+                            th:data-object-id="${device?.ID}"> <!--Custom attribute th:data-*; same as: th:attr="data-object-id=|${device?.ID}|">-->
+                        Open edit menu
+                    </button>
+                </td>
+                <td>
+                    <form action="#" method="post" th:action="@{'/deleteDevice/id/' + ${device?.ID}}">
+                        <button type="submit" class="btn btn-outline-primary btn-sm">Delete device with id [[${device.ID}]]</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="container mt-1 mb-5" th:if="${totalPages > 1}">
+    <ul class="pagination justify-content-center">
+        <li class="page-item">
+            <a class="page-link" th:href="@{'/alldevicespaginated/page/' + ${1}}" th:if="${currentPage>1}">First</a>
+            <span class="page-link text-white bg-secondary disabled" th:unless="${currentPage>1}">First</span>
+        </li>
+        <li class="page-item">
+            <a class="page-link" th:href="@{'/alldevicespaginated/page/' + ${currentPage - 1}}" th:if="${currentPage > 1}">Previous</a>
+            <span class="page-link text-white bg-secondary disabled" th:unless="${currentPage > 1}">Previous</span>
+        </li>
+        <li class="page-item"> <!--th:each="i: ${#numbers.sequence(1, totalPages)}"-->
+<!--            <a class="page-link" th:href="@{'/alldevicespaginated/page/' + ${i}}" th:if="${currentPage != i}">[[${i}]]</a>-->
+            <span class="page-link text-white bg-info disabled">[[${currentPage}]]</span> <!--th:unless="${currentPage != i}"-->
+        </li>
+        <li class="page-item">
+            <a class="page-link" th:href="@{'/alldevicespaginated/page/' + ${currentPage + 1}}" th:if="${currentPage < totalPages}">Next</a>
+            <span class="page-link text-white bg-secondary disabled" th:unless="${currentPage < totalPages}">Next</span>
+        </li>
+        <li class="page-item">
+            <a class="page-link" th:href="@{'/alldevicespaginated/page/' + ${totalPages}}" th:if="${currentPage < totalPages}">Last</a>
+            <span class="page-link text-white bg-secondary disabled" th:unless="${currentPage < totalPages}">Last</span>
+        </li>
+    </ul>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Edit element</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="editDeviceModalForm" action="#" method="post" th:action="@{/editDevice}" th:object="${tmpDevice}">
+                    <div class="modal-body">
+<!--                        <input type="hidden" th:field="*{ID}" id="device-ID" disabled>-->
+                        <div class="form-group">
+                            <label>ID:</label>
+                            <input type="number" th:field="*{ID}" class="form-control" id="device-ID" readonly>
+<!--                            <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>-->
+                        </div>
+                        <div class="form-group">
+                            <label for="device-name">Name:</label>
+                            <input type="text" th:field="*{name}" class="form-control" id="device-name" placeholder="NodeMCU1" maxlength="10" required>
+<!--                            <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>-->
+                        </div>
+                        <div class="form-group">
+                            <label for="device-address">Address:</label>
+                            <input type="text" th:field="*{address}" class="form-control" id="device-address" placeholder="192.168.100.1" maxlength="16" required>
+<!--                            <span th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></span>-->
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Save changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    <script>
+        $('#exampleModalCenter').on('show.bs.modal', function (event) {
+            var objectID = $(event.relatedTarget).data('object-id') //Extract info from data-(object-id) attribute of button
+            document.getElementById("device-ID").value = objectID
+        })
+
+        $('#exampleModalCenter').on('shown.bs.modal', function() {
+            $('#device-name').focus();
+        })
+
+        $('#exampleModalCenter').on('hidden.bs.modal', function (e) {
+            document.getElementById("device-name").value = ''
+            document.getElementById("device-address").value = ''
+        })
+    </script>
+</div>
+
+</body>
+</html>

@@ -12,6 +12,8 @@ import org.springframework.context.annotation.Description;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.support.ResourceBundleMessageSource;
 
+import java.util.Random;
+
 
 @SpringBootApplication
 public class DemoApplication {
@@ -24,15 +26,18 @@ public class DemoApplication {
 	@Bean
 	public CommandLineRunner demo(DeviceRepository devRepo, SensorDataRepository sensorRepo) {
 		return (args) -> {
-			devRepo.save(new Device("NodeMCU1", "192.168.100.19"));
-			devRepo.save(new Device("NodeMCU2", "192.168.100.22"));
-			devRepo.save(new Device("NodeMCU3", "192.168.100.35"));
-			devRepo.save(new Device("NodeMCU4", "192.168.100.15"));
-
-			sensorRepo.save(new SensorData(1L, "DHT11", "Temperature", "18"));
-			sensorRepo.save(new SensorData(1L, "DHT11", "Temperature", "19"));
-			sensorRepo.save(new SensorData(1L, "DHT11", "Temperature", "20"));
-			sensorRepo.save(new SensorData(1L, "DHT11", "Temperature", "21"));
+			for (int i = 0; i<5; i++) {
+				String name = "NodeMCU";
+				name = name + (i+1);
+				String address = "192.168.100.";
+				address = address + (i+1);
+				devRepo.save(new Device(name, address));
+			}
+			for (int j = 0; j<48; j++) { //every 30 minutes fetch
+				String data = "";
+				data = String.valueOf(new Random().nextInt(30));
+				sensorRepo.save(new SensorData(1L, "DHT11", "Temperature", data));
+			}
 		};
 	}
 

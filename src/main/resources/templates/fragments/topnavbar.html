@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<body>
+<header th:fragment="headernavbar">
+  <nav class="navbar navbar-expand-md bg-dark navbar-dark">
+    <a class="navbar-brand" href="/">Home</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="collapsibleNavbar">
+      <div class="navbar-nav">
+        <a class="nav-item nav-link border border-secondary rounded m-1 p-1" href="/alldevices">All Devices</a>
+        <a class="nav-item nav-link border border-secondary rounded m-1 p-1" href="/alldevicespaginated">All Pages</a>
+        <a class="nav-item nav-link border border-secondary rounded m-1 p-1" href="/addDevice">Add Device</a>
+        <a class="nav-item nav-link border border-secondary rounded m-1 p-1" href="/allsensordata">All Sensor Data</a>
+        <a class="nav-item nav-link border border-secondary rounded m-1 p-1" href="/allsensordatachart">All Data Chart</a>
+        <a class="nav-item nav-link border border-secondary rounded m-1 p-1" href="/addsensordata">Add Sensor Data</a>
+      </div>
+    </div>
+  </nav>
+</header>
+</body>
+</html>

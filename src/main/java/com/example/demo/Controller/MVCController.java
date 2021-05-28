@@ -5,15 +5,25 @@ import com.example.demo.Model.SensorData;
 import com.example.demo.Repository.DeviceRepository;
 import com.example.demo.Repository.SensorDataRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 
 import javax.validation.Valid;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
-@RequestMapping("/")
+//@RequestMapping("/")
 public class MVCController {
     @Autowired
     SensorDataRepository sensorRepo;
@@ -25,6 +35,43 @@ public class MVCController {
     public String getAllSensorData(Model model) {
         model.addAttribute("allsensordatalist", sensorRepo.findAll());
         return "allsensordata";
+    }
+
+    @GetMapping("/allsensordatachart")
+    public String showAllSensorDataChart(Model model) {
+        List<SensorData> allSensorDataList = sensorRepo.findAll();
+
+        SimpleDateFormat noHoursMinutesFormat = new SimpleDateFormat("yyyy-MM-dd"); //"yyyy-MM-dd HH:mm:ss"
+        String strDateNow = noHoursMinutesFormat.format(new Date());
+        String strDateNowModifiedBeginning = strDateNow + " " + "00:00:00";
+        String strDateNowModifiedEnd = strDateNow + " " + "23:59:00";
+        Timestamp tsStartOfToday = Timestamp.valueOf(strDateNowModifiedBeginning);
+        Timestamp tsEndOfToday = Timestamp.valueOf(strDateNowModifiedEnd);
+
+        List<String> chartData = allSensorDataList.stream()
+                .filter(x->x.getDataType().equalsIgnoreCase("temperature"))
+                .filter(x->x.getPosted().before(tsEndOfToday))
+                .filter(x->x.getPosted().after(tsStartOfToday))
+                .map(SensorData::getData).collect(Collectors.toList());
+        System.out.println("chartData: " + chartData);
+        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm");
+        List<String> chartDates = allSensorDataList.stream()
+                .filter(x->x.getDataType().equalsIgnoreCase("temperature"))
+                .filter(x->x.getPosted().before(tsEndOfToday))
+                .filter(x->x.getPosted().after(tsStartOfToday))
+                .map(SensorData::getPosted)
+                .map(Timestamp::getTime)
+                .map(formatter::format)
+                .collect(Collectors.toList());
+        System.out.println("chartDates: " + chartDates);
+        if(chartData.size() == chartDates.size()) {
+            model.addAttribute("chartDates", chartDates);
+            model.addAttribute("chartData", chartData);
+        }
+        else {
+            System.out.println("Lists differ in size");
+        }
+        return "allsensordatachart";
     }
 
     @GetMapping("/addsensordata")
@@ -45,12 +92,62 @@ public class MVCController {
     //DEVICES
     @GetMapping("/alldevices")
     public String getAllDevices(Model model) {
-        model.addAttribute("alldeviceslist", devRepo.findAll());
+        List<Device> allDevicesList = devRepo.findAll().stream().collect(Collectors.toList());
+        model.addAttribute("alldeviceslist", allDevicesList);
         return "alldevices";
     }
 
+    @GetMapping("/alldevicespaginated")
+    public String findPaginated(Model model) {
+        return findPaginated(1, model);
+    }
+
+    @GetMapping("/alldevicespaginated/page/{pageNo}")
+    public String findPaginated(@PathVariable(value = "pageNo") int pageNo, Model model) {
+        int pageSize = 10;
+
+        Page<Device> page = devRepo.findAll(PageRequest.of(pageNo - 1, pageSize));
+        List<Device> deviceList = page.getContent();
+
+        model.addAttribute("currentPage", pageNo);
+        model.addAttribute("totalPages", page.getTotalPages());
+        model.addAttribute("totalItems", page.getTotalElements());
+        model.addAttribute("devicesList", deviceList);
+        model.addAttribute("tmpDevice", new Device()); //for modal form to edit
+        return "alldevicespaginated";
+    }
+
+    @PostMapping("/editDevice")
+    public String editDevice(@Valid @ModelAttribute Device device, BindingResult result, Model model) {
+        Device tmpDeviceFromDB = null;
+        if (device.getID() != null && device.getName() != null && device.getAddress() != null) {
+            if (devRepo.existsById(device.getID()) && devRepo.findById(device.getID()).isPresent()) {
+                tmpDeviceFromDB = devRepo.findById(device.getID()).get();
+            }
+            if (tmpDeviceFromDB != null) {
+                if (tmpDeviceFromDB.getToken() != null)
+                    device.setToken(tmpDeviceFromDB.getToken());
+                if (tmpDeviceFromDB.getRegistered() != null)
+                    device.setRegistered(tmpDeviceFromDB.getRegistered());
+            }
+            devRepo.save(device);
+            return "redirect:/alldevicespaginated";
+        }
+        return null;
+    }
+
+    @PostMapping("/deleteDevice/id/{deviceID}")
+    public String deleteDevice(@PathVariable(value = "deviceID") Long deviceID, Model model) {
+        devRepo.deleteById(deviceID);
+        return "redirect:/alldevicespaginated";
+//        ModelAndView model = new ModelAndView("alldevicespaginated");
+//        model.addAttribute(new Device());
+//        model.setStatus(HttpStatus.CREATED);
+//        return model;
+    }
+
     @GetMapping("/addDevice")
-    public String addDevice(Model model) {
+    public String showAddDevicePage(Model model) {
         model.addAttribute("device", new Device());
         return "addDevice";
     }

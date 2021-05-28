@@ -41,6 +41,14 @@ public class SensorData implements Serializable {
     public SensorData() {
     }
 
+    public SensorData(Long deviceId, String sensor, String dataType, String data, Timestamp posted) {
+        this.deviceId = deviceId;
+        this.sensor = sensor;
+        this.dataType = dataType;
+        this.data = data;
+        this.posted = posted;
+    }
+
     public SensorData(Long deviceId, String sensor, String dataType, String data) {
         this.deviceId = deviceId;
         this.sensor = sensor;

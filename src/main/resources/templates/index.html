@@ -9,7 +9,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </head>
-<body class="text-decoration-none">
+<body id="bodyelement" class="bg-light">
+
+<button class="btn btn-outline-primary" onclick="this.blur(); myDarkModeFunction()">Dark</button>
 
 <div class="container mt-3 jumbotron shadow">
     <h1>Welcome</h1>
@@ -17,31 +19,38 @@
 </div>
 
 <div class="container p-3 bg-light rounded shadow">
-    <div class="row">
-        <div class="col">
-            <div class="list-group">
-                <h3>Sensor Data</h3>
-                <a class="shadow btn btn-outline-info mt-3" href="/allsensordata">All sensor data</a>
-                <a class="shadow btn btn-outline-info mt-3" href="/addsensordata">Add sensor data</a>
-            </div>
+    <div class="mt-3">
+        <div class="list-group">
+            <h3>Device Data</h3>
+            <a class="shadow-sm btn btn-outline-info mt-3" href="/alldevices">View all devices as one list</a>
+            <a class="shadow-sm btn btn-outline-info mt-3" href="/alldevicespaginated">View all devices paginated</a>
+            <a class="shadow-sm btn btn-outline-info mt-3" href="/addDevice">New device</a>
         </div>
-        <div class="col">
-            <div class="list-group">
-                <h3>Device Data</h3>
-                <a class="shadow btn btn-outline-info mt-3" href="/alldevices">All devices</a>
-                <a class="shadow btn btn-outline-info mt-3" href="/addDevice">Add device</a>
-            </div>
+    </div>
+    <div class="mt-3">
+        <div class="list-group">
+            <h3>Sensor Data</h3>
+            <a class="shadow-sm btn btn-outline-info mt-3" href="/allsensordata">View all sensor data</a>
+            <a class="shadow-sm btn btn-outline-info mt-3" href="/allsensordatachart">View all sensor data chart</a>
+            <a class="shadow-sm btn btn-outline-info mt-3" href="/addsensordata">New sensor data</a>
         </div>
     </div>
 </div>
 
-<div class="container">
-    <form class="mt-3 row" th:action="@{/logout}" method="post">
-        <div class="col">
-            <input type="submit" value="Logout" class="shadow btn btn-outline-dark"/>
-        </div>
+<div class="container mt-5 mb-5 p-3 bg-light rounded shadow">
+    <form th:action="@{/logout}" method="post">
+        <input type="submit" value="Logout" class="col shadow-sm btn btn-outline-danger"/>
     </form>
 </div>
+
+<script>
+function myDarkModeFunction() {
+  var bodyelement = document.getElementById("bodyelement");
+  if (bodyelement.classList) {
+    bodyelement.classList.toggle("bg-dark");
+  }
+}
+</script>
 
 </body>
 </html>

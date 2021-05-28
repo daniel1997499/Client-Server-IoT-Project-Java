@@ -8,31 +8,15 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
 </head>
 <body>
 
-<nav class="navbar navbar-expand-md bg-dark navbar-dark">
-    <a class="navbar-brand" href="/">Home</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="collapsibleNavbar">
-        <ul class="navbar-nav">
-            <li class="nav-item">
-                <a class="nav-link" href="/allsensordata">All Sensor Data</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/addsensordata">Add Sensor Data</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/alldevices">All Devices</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/addDevice">Add Device</a>
-            </li>
-        </ul>
-    </div>
-</nav>
+<header th:insert="fragments/topnavbar.html :: headernavbar"></header>
 
 <div class="jumbotron jumbotron-fluid text-center">
     <h2>All Device Data in Database</h2>
@@ -40,27 +24,38 @@
 <div class="container">
     <div class="table-responsive">
         <table class="table table-dark table-striped">
-        <thead>
-        <tr>
-            <th>Device ID</th>
-            <th>Name</th>
-            <th>Address</th>
-            <th>Token</th>
-            <th>Time Registered</th>
-        </tr>
-        </thead>
-        <tbody id="devicedatatable">
-        <tr th:each="device: ${alldeviceslist}">
-            <td th:text="${device?.ID}" />
-            <td th:text="${device?.name}" />
-            <td th:text="${device?.address}" />
-            <td th:text="${device?.shortToken}" />
-            <td th:text="${device?.registered}" />
-        </tr>
-        </tbody>
-    </table>
+            <thead>
+            <tr>
+                <th>Device ID</th>
+                <th>Name</th>
+                <th>Address</th>
+                <th>Token</th>
+                <th>Time Registered</th>
+            </tr>
+            </thead>
+            <tbody id="devicedatatable">
+            <tr th:each="device: ${alldeviceslist}">
+                <td th:text="${device?.ID}" />
+                <td th:text="${device?.name}" />
+                <td th:text="${device?.address}" />
+                <td th:text="${device?.shortToken}" />
+                <td th:text="${device?.registered}" />
+            </tr>
+            </tbody>
+        </table>
     </div>
 </div>
+
+<button onclick="scrollToTop()" class="my-3 mr-3 btn btn-outline-secondary float-right">^</button>
+
+<script>
+function scrollToTop() {
+  document.documentElement.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  })
+}
+</script>
 
 </body>
 </html>
