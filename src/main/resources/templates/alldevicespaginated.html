@@ -9,7 +9,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </head>
-<body>
+<body class="changeableBg">
+<span id="bgColorDiv" class="d-none" th:text="${appContext?.globalColor}"/>
 
 <header th:insert="fragments/topnavbar.html :: headernavbar"> </header>
 
@@ -67,7 +68,7 @@
             <span class="page-link text-white bg-secondary disabled" th:unless="${currentPage > 1}">Previous</span>
         </li>
         <li class="page-item"> <!--th:each="i: ${#numbers.sequence(1, totalPages)}"-->
-<!--            <a class="page-link" th:href="@{'/alldevicespaginated/page/' + ${i}}" th:if="${currentPage != i}">[[${i}]]</a>-->
+            <!--            <a class="page-link" th:href="@{'/alldevicespaginated/page/' + ${i}}" th:if="${currentPage != i}">[[${i}]]</a>-->
             <span class="page-link text-white bg-info disabled">[[${currentPage}]]</span> <!--th:unless="${currentPage != i}"-->
         </li>
         <li class="page-item">
@@ -83,41 +84,52 @@
 
 <!-- Modal -->
 <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLongTitle">Edit element</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <form id="editDeviceModalForm" action="#" method="post" th:action="@{/editDevice}" th:object="${tmpDevice}">
-                    <div class="modal-body">
-<!--                        <input type="hidden" th:field="*{ID}" id="device-ID" disabled>-->
-                        <div class="form-group">
-                            <label>ID:</label>
-                            <input type="number" th:field="*{ID}" class="form-control" id="device-ID" readonly>
-<!--                            <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>-->
-                        </div>
-                        <div class="form-group">
-                            <label for="device-name">Name:</label>
-                            <input type="text" th:field="*{name}" class="form-control" id="device-name" placeholder="NodeMCU1" maxlength="10" required>
-<!--                            <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>-->
-                        </div>
-                        <div class="form-group">
-                            <label for="device-address">Address:</label>
-                            <input type="text" th:field="*{address}" class="form-control" id="device-address" placeholder="192.168.100.1" maxlength="16" required>
-<!--                            <span th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></span>-->
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Save changes</button>
-                    </div>
-                </form>
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Edit element</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
+            <form id="editDeviceModalForm" action="#" method="post" th:action="@{/editDevice}" th:object="${tmpDevice}">
+                <div class="modal-body">
+                    <!--                        <input type="hidden" th:field="*{ID}" id="device-ID" disabled>-->
+                    <div class="form-group">
+                        <label>ID:</label>
+                        <input type="number" th:field="*{ID}" class="form-control" id="device-ID" readonly>
+                        <!--                            <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>-->
+                    </div>
+                    <div class="form-group">
+                        <label for="device-name">Name:</label>
+                        <input type="text" th:field="*{name}" class="form-control" id="device-name" th:placeholder="#{alldevicespaginated.name.placeholder}" maxlength="10" required>
+                        <!--                            <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}"></span>-->
+                    </div>
+                    <div class="form-group">
+                        <label for="device-address">Address:</label>
+                        <input type="text" th:field="*{address}" class="form-control" id="device-address" th:placeholder="#{alldevicespaginated.address.placeholder}" maxlength="16" required>
+                        <!--                            <span th:if="${#fields.hasErrors('address')}" th:errors="*{address}"></span>-->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                </div>
+            </form>
         </div>
+    </div>
+
     <script>
+        $(document).ready(function() {
+            var tmpBgColor = $("#bgColorDiv").text();
+            finalBgColor = "bg-" + tmpBgColor.toLowerCase();
+
+            var elements = document.getElementsByClassName("changeableBg");
+            for(let i=0; i< elements.length; i+=1) {
+                elements.item(i).classList.toggle(finalBgColor);
+            }
+        });
+
         $('#exampleModalCenter').on('show.bs.modal', function (event) {
             var objectID = $(event.relatedTarget).data('object-id') //Extract info from data-(object-id) attribute of button
             document.getElementById("device-ID").value = objectID

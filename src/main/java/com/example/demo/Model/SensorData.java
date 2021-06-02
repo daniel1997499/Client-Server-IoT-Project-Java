@@ -14,14 +14,11 @@ import java.sql.Timestamp;
 public class SensorData implements Serializable {
     @Id
     @GeneratedValue
-    private Long ID;
+    private Long dataID;
     @NotNull
     @Min(1)
     @Column(name = "device_id", nullable = false)
     private Long deviceId;
-//    @Column(name = "token", nullable = false)
-    @Transient
-    private String token;
     @NotNull
     @Size(min=1, max=30)
     @Column(name = "sensor", nullable = false)
@@ -56,12 +53,12 @@ public class SensorData implements Serializable {
         this.data = data;
     }
 
-    public Long getID() {
-        return ID;
+    public Long getDataID() {
+        return dataID;
     }
 
-    public void setID(Long ID) {
-        this.ID = ID;
+    public void setDataID(Long dataID) {
+        this.dataID = dataID;
     }
 
     public Long getDeviceId() {
@@ -70,14 +67,6 @@ public class SensorData implements Serializable {
 
     public void setDeviceId(Long deviceId) {
         this.deviceId = deviceId;
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
     }
 
     public String getSensor() {

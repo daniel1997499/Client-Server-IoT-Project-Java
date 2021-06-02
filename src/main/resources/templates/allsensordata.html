@@ -14,7 +14,8 @@
         }
     </style>
 </head>
-<body>
+<body class="changeableBg">
+<span id="bgColorDiv" class="d-none" th:text="${appContext?.globalColor}"/>
 
 <header th:insert="fragments/topnavbar.html :: headernavbar"> </header>
 
@@ -46,15 +47,25 @@
     </div>
 </div>
 
-<button onclick="scrollToTop()" class="my-3 mr-3 btn btn-outline-secondary float-right">^</button>
+<button onclick="this.blur(); scrollToTop()" class="my-3 mr-3 btn btn-outline-secondary float-right">^</button>
 
 <script>
-function scrollToTop() {
-  document.documentElement.scrollTo({
-    top: 0,
-    behavior: "smooth"
-  })
-}
+    $(document).ready(function() {
+    var tmpBgColor = $("#bgColorDiv").text();
+    finalBgColor = "bg-" + tmpBgColor.toLowerCase();
+
+    var elements = document.getElementsByClassName("changeableBg");
+        for(let i=0; i< elements.length; i+=1) {
+            elements.item(i).classList.toggle(finalBgColor);
+        }
+    });
+
+    function scrollToTop() {
+      document.documentElement.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      })
+    }
 </script>
 
 </body>

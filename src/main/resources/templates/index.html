@@ -5,17 +5,29 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<!--    <link rel="stylesheet" href="mystyle.css">-->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </head>
-<body id="bodyelement" class="bg-light">
+<body class="changeableBg">
 
-<button class="btn btn-outline-primary" onclick="this.blur(); myDarkModeFunction()">Dark</button>
+<span id="bgColorDiv" class="d-none" th:text="${appContext?.globalColor}"/>
 
-<div class="container mt-3 jumbotron shadow">
+<div class="container jumbotron shadow">
     <h1>Welcome</h1>
     <p>This is the home page of the project, it is responsive</p>
+    <form method="post" th:action="@{/changeColor}" th:object="${appContext}">
+        <div class="form-group">
+            <label for="bgSelect" th:text="#{bgSelect.label}"/>
+            <select id="bgSelect" class="form-control" th:field="*{globalColor}" onchange="this.form.submit()">
+                <option th:each="Colors: ${colorsList}"
+                        th:value="${Colors}"
+                        th:text="${Colors}">
+                </option>
+            </select>
+        </div>
+    </form>
 </div>
 
 <div class="container p-3 bg-light rounded shadow">
@@ -44,12 +56,15 @@
 </div>
 
 <script>
-function myDarkModeFunction() {
-  var bodyelement = document.getElementById("bodyelement");
-  if (bodyelement.classList) {
-    bodyelement.classList.toggle("bg-dark");
-  }
-}
+$(document).ready(function() {
+var tmpBgColor = $("#bgColorDiv").text();
+finalBgColor = "bg-" + tmpBgColor.toLowerCase();
+
+var elements = document.getElementsByClassName("changeableBg");
+    for(let i=0; i< elements.length; i+=1) {
+        elements.item(i).classList.toggle(finalBgColor);
+    }
+});
 </script>
 
 </body>
