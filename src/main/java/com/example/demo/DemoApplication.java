@@ -30,19 +30,20 @@ public class DemoApplication {
 	@Bean
 	public CommandLineRunner demo(DeviceRepository devRepo, SensorDataRepository sensorRepo) {
 		return (args) -> {
-			for (int i = 0; i<15; i++) {
+			//Creating some placeholders
+			for (int i = 0; i<100; i++) {
 				String name = "NodeMCU";
 				name = name + (i+1);
 				String address = "192.168.100.";
-				address = address + (i+1);
-				devRepo.save(new Device(name, address));
-				log.info("Registered new device: " + name + " - " + address);
+				address = address + new Random().nextInt(100);
+				Device savedDevice = devRepo.save(new Device(name, address));
+				log.info("Registered new device: " + savedDevice.getName() + " - " + savedDevice.getAddress());
 			}
-			for (int j = 0; j<48; j++) { //every 30 minutes fetch
+			for (int j = 0; j<4; j++) {
 				String data = "";
 				data = String.valueOf(new Random().nextInt(30));
-				sensorRepo.save(new SensorData(1L, "DHT11", "Temperature", data));
-				log.info("Registered new sensor data: " + "DHT11" + " - " + data);
+				SensorData savedData = sensorRepo.save(new SensorData(1L, "DHT11", "Temperature", data));
+				log.info("Registered new sensor data: " + " - " + savedData.getDeviceId() + " - " + savedData.getSensor() + " - " + " - " + savedData.getDataType() + " - " + savedData.getData());
 			}
 		};
 	}

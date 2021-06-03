@@ -11,11 +11,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -44,51 +45,63 @@ public class APIController {
 
     @PostMapping(value = "/api/authenticate", consumes = "application/json", produces = "application/json")
     public ResponseEntity<Object> doAuthenticate(@RequestBody Device device) { //deviceName+IPv4Addr
+        log.info("Request to authenticate");
         if (device.getName() != null && device.getAddress() != null) {
+            log.info("from device: " + device.getName() + " - " + device.getAddress());
             if (!Pattern.matches("\\W", device.getName()) && isValidInet4Address(device.getAddress())) {// "\\w" is searching for [a-zA-Z_0-9], nonWord characters not included
-                if (devRepo.existsByName(device.getName()) && devRepo.existsByAddress(device.getAddress())) {
-                    List<Device> tmpDevListByName = devRepo.findDeviceByName(device.getName());
-                    List<Device> tmpDevListByAddress = devRepo.findDeviceByAddress(device.getAddress());
-                    if (tmpDevListByName.stream().findFirst().get().getID().equals(tmpDevListByAddress.stream().findFirst().get().getID()))
-                        device.setID(tmpDevListByName.stream().findFirst().get().getID());
-                    device.setRegistered(tmpDevListByName.stream().findFirst().get().getRegistered());
+                if (!devRepo.existsByName(device.getName()) && !devRepo.existsByAddress(device.getAddress())) { //no such name or address, register as new
+                    Device savedDevice = devRepo.save(device);
                     Map<String, Object> claims = new HashMap<>();
-                    claims.put(jwtClaimDeviceId, device.getID());
-                    claims.put(jwtClaimDeviceName, device.getName());
-                    claims.put(jwtClaimDeviceAddress, device.getAddress());
-                    String token = jwtTokenUtil.generateToken(claims, device);
-                    device.setToken(token);
-                    devRepo.save(device); //we pass id so device is updated rather than saved as new
+                    claims.put(jwtClaimDeviceId, savedDevice.getID());
+                    claims.put(jwtClaimDeviceName, savedDevice.getName());
+                    claims.put(jwtClaimDeviceAddress, savedDevice.getAddress());
+                    String token = jwtTokenUtil.generateToken(claims, savedDevice);
+                    savedDevice.setToken(token);
+                    devRepo.save(savedDevice);
                     return new ResponseEntity<>(token, HttpStatus.OK);
                 }
-                else { //is not present in DB
-                    log.warn("Registering as new device");
-                    devRepo.save(device);
-                    //TODO NEED A JOINT SELECT; Search in DB with joint selection from name and address
-                    List<Device> tmpDevListByName = devRepo.findDeviceByName(device.getName());
-                    List<Device> tmpDevListByAddress = devRepo.findDeviceByAddress(device.getAddress());
-                    if (tmpDevListByName.stream().findFirst().get().getID().equals(tmpDevListByAddress.stream().findFirst().get().getID()))
-                        device.setID(tmpDevListByName.stream().findFirst().get().getID());
-                    device.setRegistered(tmpDevListByName.stream().findFirst().get().getRegistered());
-
-                    Map<String, Object> claims = new HashMap<>();
-                    claims.put(jwtClaimDeviceId, device.getID());
-                    claims.put(jwtClaimDeviceName, device.getName()); //TODO Give random name for security
-                    claims.put(jwtClaimDeviceAddress, device.getAddress()); //not needed
-                    String token = jwtTokenUtil.generateToken(claims, device);
-                    device.setToken(token);
-                    devRepo.save(device);
-                    return new ResponseEntity<>(token , HttpStatus.OK);
+                else {
+                    log.warn("Device with this name or address already registered");
+//                    if (devRepo.existsByName(device.getName()) && devRepo.existsByAddress(device.getAddress())) {
+//                        //TODO NEED JOINT SELECT
+//                    }
+                    if (devRepo.existsByName(device.getName())) {
+                        log.warn("Name already registered, overwriting");
+                        Device existingDevice = devRepo.findDeviceByName(device.getName()).stream().findFirst().get();
+                        existingDevice.setAddress(device.getAddress());
+                        Map<String, Object> claims = new HashMap<>();
+                        claims.put(jwtClaimDeviceId, existingDevice.getID());
+                        claims.put(jwtClaimDeviceName, existingDevice.getName());
+                        claims.put(jwtClaimDeviceAddress, existingDevice.getAddress());
+                        String token = jwtTokenUtil.generateToken(claims, existingDevice);
+                        existingDevice.setToken(token);
+                        devRepo.save(existingDevice);
+                        return new ResponseEntity<>(token, HttpStatus.OK);
+                    }
+                    if (devRepo.existsByAddress(device.getAddress())) {
+                        log.warn("Address already registered, registering as new device anyway");
+                        Device savedDevice = devRepo.save(device);
+                        Map<String, Object> claims = new HashMap<>();
+                        claims.put(jwtClaimDeviceId, savedDevice.getID());
+                        claims.put(jwtClaimDeviceName, savedDevice.getName());
+                        claims.put(jwtClaimDeviceAddress, savedDevice.getAddress());
+                        String token = jwtTokenUtil.generateToken(claims, savedDevice);
+                        savedDevice.setToken(token);
+                        devRepo.save(savedDevice);
+                        return new ResponseEntity<>(token, HttpStatus.OK);
+                    }
                 }
             }
-            log.error("Device name or IP address are of wrong format");
+            else
+                log.error("Device name or IP address are of wrong format");
         }
-        log.error("Some value is null");
+        else
+            log.error("Some value is null");
         return new ResponseEntity<>("Bad request", HttpStatus.BAD_REQUEST);
     }
 
     @PostMapping(value = "/api/sensordatajwt", consumes = "application/json", produces = "application/json")
-    public ResponseEntity<Object> saveSensorData(@RequestHeader("Authorization") String jwt , @Valid @RequestBody SensorData sensorData) {
+    public ResponseEntity<Object> saveSensorData(@RequestHeader("Authorization") String jwt , @RequestBody SensorData sensorData) {
         if (jwt != null) {
             if (sensorData.getDeviceId() != null && sensorData.getSensor() != null && sensorData.getDataType() != null && sensorData.getData() != null
                     && devRepo.existsById(sensorData.getDeviceId())) {
