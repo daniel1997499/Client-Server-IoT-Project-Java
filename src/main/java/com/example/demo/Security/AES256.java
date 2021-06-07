@@ -29,7 +29,7 @@ public class AES256 {
             return Base64.getEncoder()
                     .encodeToString(cipher.doFinal(strToEncrypt.getBytes(StandardCharsets.UTF_8)));
         } catch (Exception e) {
-            System.out.println("Error while encrypting: " + e.toString());
+            e.printStackTrace();
         }
         return null;
     }

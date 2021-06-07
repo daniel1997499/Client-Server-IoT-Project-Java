@@ -1,7 +1,6 @@
 package com.example.demo.Controller;
 
 import com.example.demo.Constants.Colors;
-import com.example.demo.DemoApplication;
 import com.example.demo.Model.AppContext;
 import com.example.demo.Model.Device;
 import com.example.demo.Model.SensorData;
@@ -30,7 +29,7 @@ import java.util.stream.Collectors;
 @RequestMapping({"/", "/index", "/home"})
 @SessionAttributes("appContextInSession")
 public class MVCController {
-    private Logger log = LoggerFactory.getLogger(DemoApplication.class);
+    private Logger log = LoggerFactory.getLogger(MVCController.class);
     private final int pageSize = 10; //nr. of rows per table on page
     @Autowired
     SensorDataRepository sensorRepo;

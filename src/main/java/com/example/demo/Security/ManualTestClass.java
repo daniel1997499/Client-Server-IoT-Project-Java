@@ -129,5 +129,53 @@ public class ManualTestClass {
 //        Timestamp tsEndOfToday = Timestamp.valueOf(dayNowModifiedEnd); //now, beginning of the day
 //        System.out.println(tsStartOfToday);
 //        System.out.println(tsEndOfToday);
+
+//        String secret = "sgfd23#@%%!f3rgt43afahrthjsdajfgj0";
+//        String address = "192.168.100.20";
+//        String name = "NodeMCU#001";
+//        String both;
+
+//        String deviceId = "11";
+//        String sensor = "DHT11";
+//        String dataType = "humidity";
+//        String data = "71";
+//
+//        Base64UrlCodec codec2 = new Base64UrlCodec();
+//        System.out.println("base64URL name: " + codec2.encode(name)); //good
+//        System.out.println("base64URL address: " + codec2.encode(address)); //good
+//        both = codec2.encode(name) + codec2.encode(address);
+//        System.out.println(both);
+//
+//        try {
+//            byte[] hmacSha256 = calcHmacSha256(secret.getBytes("UTF-8"), both.getBytes("UTF-8"));
+//            System.out.println(String.format("Hex: %032x", new BigInteger(1, hmacSha256)));
+//        } catch (UnsupportedEncodingException e) {
+//            e.printStackTrace();
+//        }
+//
+//
+//    }
+//
+//    static public byte[] calcHmacSha256(byte[] secretKey, byte[] message) {
+//        byte[] hmacSha256 = null;
+//        try {
+//            Mac mac = Mac.getInstance("HmacSHA256");
+//            SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey, "HmacSHA256");
+//            mac.init(secretKeySpec);
+//            hmacSha256 = mac.doFinal(message);
+//        } catch (Exception e) {
+//            throw new RuntimeException("Failed to calculate hmac-sha256", e);
+//        }
+//        return hmacSha256;
+//        MyToken tokenUtil = new MyToken();
+//        System.out.println(tokenUtil.encode64Url("NodeMCU#001", "192.168.100.20"));
+//
+//        System.out.println(tokenUtil.encode64Url("NodeMCU#001"));
+//
+//        System.out.println(tokenUtil.encode64Url("192.168.100.20"));
+//
+//        System.out.println(tokenUtil.calcHmacSha256(tokenUtil.encode64Url("NodeMCU#001", "192.168.100.20")));
+//
+//        System.out.println(tokenUtil.calcHmacSha256(tokenUtil.encode64Url("NodeMCU#001") + tokenUtil.encode64Url("192.168.100.20")));
     }
 }
