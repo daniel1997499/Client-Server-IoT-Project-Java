@@ -42,12 +42,12 @@
                     <button type="button" class="btn btn-outline-primary btn-sm"
                             data-toggle="modal"
                             data-target="#exampleModalCenter"
-                            th:data-object-id="${device?.ID}"> <!--Custom attribute th:data-*; same as: th:attr="data-object-id=|${device?.ID}|">-->
+                            th:data-object-id="|${device?.ID}|"> <!--Custom attribute th:data-*; same as: th:attr="data-object-id=|${device?.ID}|">-->
                         Open edit menu
                     </button>
                 </td>
                 <td>
-                    <form action="#" method="post" th:action="@{'/deleteDevice/id/' + ${device?.ID}}">
+                    <form method="post" th:action="@{'/deleteDevice/id/' + ${device?.ID}}">
                         <button type="submit" class="btn btn-outline-primary btn-sm">Delete device with id [[${device.ID}]]</button>
                     </form>
                 </td>
@@ -92,7 +92,7 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form id="editDeviceModalForm" action="#" method="post" th:action="@{/editDevice}" th:object="${tmpDevice}">
+            <form id="editDeviceModalForm" method="post" th:action="@{/editDevice}" th:object="${tmpDevice}">
                 <div class="modal-body">
                     <!--                        <input type="hidden" th:field="*{ID}" id="device-ID" disabled>-->
                     <div class="form-group">

@@ -31,7 +31,7 @@ public class DemoApplication {
 	public CommandLineRunner demo(DeviceRepository devRepo, SensorDataRepository sensorRepo) {
 		return (args) -> {
 			//Creating some placeholders
-			for (int i = 0; i<5; i++) {
+			for (int i = 0; i<10; i++) {
 				String name = "NodeMCU";
 				name = name + (i+1);
 				String address = "192.168.100.";
@@ -39,7 +39,7 @@ public class DemoApplication {
 				Device savedDevice = devRepo.save(new Device(name, address));
 				log.info("Registered new device: " + savedDevice.getName() + " - " + savedDevice.getAddress());
 			}
-			for (int j = 0; j<5; j++) {
+			for (int j = 0; j<10; j++) {
 				String data = "";
 				data = String.valueOf(new Random().nextInt(30));
 				SensorData savedData = sensorRepo.save(new SensorData(1L, "DHT11", "Temperature", data));

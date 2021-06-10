@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.UnsupportedEncodingException;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @RestController
@@ -28,13 +29,26 @@ public class APIController {
     MyToken tokenUtil;
 
     public static boolean isValidInet4Address(String ip) {
-        String[] groups = ip.split("\\.");
-        boolean result = true;
-        for (String x: groups)
-            if (Pattern.matches("\\D", x)) {
-                return false;
+        Pattern pattern = Pattern.compile("\\D");
+        int counter = 0;
+        if (ip.contains(".")) {
+            String[] groups = ip.split("\\.");
+            if (groups.length == 4) {
+                for (String x : groups) {
+                    if (x.length() >= 1 && x.length() <= 3) {
+                        Matcher matcher = pattern.matcher(x);
+                        if (matcher.find()) {//non-digit
+                            continue;
+                        } else {
+                            counter++;
+                        }
+                    }
+                }
             }
-        return result;
+        }
+        if (counter == 4)
+            return true;
+        return false;
     }
 
     @PostMapping(value = "/api/authenticate", consumes = "application/json", produces = "application/json")
@@ -98,29 +112,40 @@ public class APIController {
     public ResponseEntity<Object> saveSensorData(@RequestHeader("Authorization") String myToken, @RequestBody SensorData sensorData) {
         log.info("Request to post data");
         if (myToken != null) {
-            if (sensorData.getDeviceId() != null && sensorData.getSensor() != null && sensorData.getDataType() != null && sensorData.getData() != null
-                    && devRepo.existsById(sensorData.getDeviceId())) {
-                log.info("from: " + sensorData.getDeviceId() + " " + sensorData.getSensor() + " " + sensorData.getDataType() + " " + sensorData.getData());
-                String hmacsha256str = null;
-                try {
-                    hmacsha256str = tokenUtil.calcHmacSha256(tokenUtil.encode64Url(sensorData.getDeviceId().toString()) +
-                            tokenUtil.encode64Url(sensorData.getSensor()) +
-                            tokenUtil.encode64Url(sensorData.getDataType()) +
-                            tokenUtil.encode64Url(sensorData.getData()));
-                } catch (UnsupportedEncodingException e) {
-                    e.printStackTrace();
+            if (sensorData.getDeviceId() != null && sensorData.getSensor() != null && sensorData.getDataType() != null && sensorData.getData() != null) {
+                if (devRepo.existsById(sensorData.getDeviceId())) {
+                    log.info("from: " + sensorData.getDeviceId() + " " + sensorData.getSensor() + " " + sensorData.getDataType() + " " + sensorData.getData());
+                    tokenUtil = new MyToken();
+                    String hmacsha256str = null;
+                    try {
+                        hmacsha256str = tokenUtil.calcHmacSha256(tokenUtil.encode64Url(sensorData.getDeviceId().toString()) +
+                                tokenUtil.encode64Url(sensorData.getSensor()) +
+                                tokenUtil.encode64Url(sensorData.getDataType()) +
+                                tokenUtil.encode64Url(sensorData.getData()));
+                    } catch (UnsupportedEncodingException e) {
+                        e.printStackTrace();
+                    }
+                    log.info("Comparing Tokens");
+                    if (hmacsha256str != null && hmacsha256str.equalsIgnoreCase(myToken)) {
+                        log.info("Tokens match");
+                        sensorRepo.save(sensorData);
+                        log.info("Data posted: " + sensorData.getDeviceId() + " " + sensorData.getSensor() + " " + sensorData.getDataType() + " " + sensorData.getData());
+                        return new ResponseEntity<>("Data Posted", HttpStatus.OK);
+                    } else {
+                        log.error("Tokens don't match");
+                    }
                 }
-                log.info("Comparing Tokens");
-                if (hmacsha256str != null && hmacsha256str.equalsIgnoreCase(myToken)) {
-                    log.info("Tokens match");
-                    sensorRepo.save(sensorData);
-                    log.info("Data posted: " + sensorData.getDeviceId() + " " + sensorData.getSensor() + " " + sensorData.getDataType() + " " + sensorData.getData());
-                    return new ResponseEntity<>("Data Posted", HttpStatus.OK);
+                else {
+                    log.error("Device id not registered");
                 }
             }
-            log.error("Some value is null");
+            else {
+                log.error("Some value is null");
+            }
         }
-        log.error("No token token provided");
+        else {
+            log.error("No token provided");
+        }
         return new ResponseEntity<>("Bad request", HttpStatus.BAD_REQUEST);
     }
 }

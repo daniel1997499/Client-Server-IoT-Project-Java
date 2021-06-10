@@ -23,6 +23,8 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Controller
@@ -35,6 +37,29 @@ public class MVCController {
     SensorDataRepository sensorRepo;
     @Autowired
     DeviceRepository devRepo;
+
+    public static boolean isValidInet4Address(String ip) {
+        Pattern pattern = Pattern.compile("\\D");
+        int counter = 0;
+        if (ip.contains(".")) {
+            String[] groups = ip.split("\\.");
+            if (groups.length == 4) {
+                for (String x : groups) {
+                    if (x.length() >= 1 && x.length() <= 3) {
+                            Matcher matcher = pattern.matcher(x);
+                            if (matcher.find()) {//non-digit
+                                continue;
+                            } else {
+                                counter++;
+                            }
+                    }
+                }
+            }
+        }
+        if (counter == 4)
+            return true;
+        return false;
+    }
 
     //used for storing value in session to persist between pages
     @ModelAttribute("appContextInSession")
@@ -76,6 +101,7 @@ public class MVCController {
         Timestamp tsStartOfToday = Timestamp.valueOf(strDateNowModifiedBeginning);
         Timestamp tsEndOfToday = Timestamp.valueOf(strDateNowModifiedEnd);
 
+        //TODO ADD METHOD TO REPOSITORY getBySensor OR SOMETHING LIKE THAT
         List<String> chartData = allSensorDataList.stream()
                 .filter(x->x.getDataType().equalsIgnoreCase("temperature"))
                 .filter(x->x.getPosted().before(tsEndOfToday))
@@ -149,21 +175,32 @@ public class MVCController {
     public String editDevice(@Valid @ModelAttribute Device device, BindingResult result, Model model) {
         Device tmpDeviceFromDB = null;
         if (device.getID() != null && device.getName() != null && device.getAddress() != null) {
-            if (devRepo.existsById(device.getID()) && devRepo.findById(device.getID()).isPresent()) {
-                tmpDeviceFromDB = devRepo.findById(device.getID()).get();
+            if (isValidInet4Address(device.getAddress())) {
+                if (devRepo.existsById(device.getID())) {
+                    tmpDeviceFromDB = devRepo.findById(device.getID()).get();
+                }
+                else {
+                    log.error("Device is not registered in database");
+                }
+                if (tmpDeviceFromDB != null) {
+                    if (tmpDeviceFromDB.getToken() != null)
+                        device.setToken(tmpDeviceFromDB.getToken());
+                    if (tmpDeviceFromDB.getRegistered() != null)
+                        device.setRegistered(tmpDeviceFromDB.getRegistered());
+                }
+                else {
+                    log.warn("Registering as new device");
+                }
+                devRepo.save(device);
+                return "redirect:/alldevicespaginated";
             }
-            log.error("Device is not registered in database");
-            if (tmpDeviceFromDB != null) {
-                if (tmpDeviceFromDB.getToken() != null)
-                    device.setToken(tmpDeviceFromDB.getToken());
-                if (tmpDeviceFromDB.getRegistered() != null)
-                    device.setRegistered(tmpDeviceFromDB.getRegistered());
+            else {
+                log.error("Wrong IP format");
             }
-            log.warn("Registering as new device");
-            devRepo.save(device);
-            return "redirect:/alldevicespaginated";
         }
-        log.error("Some value is null");
+        else {
+            log.error("Some value is null");
+        }
         return "redirect:/alldevicespaginated";
     }
 
