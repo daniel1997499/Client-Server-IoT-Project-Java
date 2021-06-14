@@ -15,6 +15,12 @@
 
 <header th:insert="fragments/topnavbar.html :: headernavbar"> </header>
 
+<div>
+    <span class="font-weight-bold badge badge-danger" th:if="${tempMessage != null && badgeToShow == 'danger'}">[[${tempMessage}]]</span>
+    <span class="font-weight-bold badge badge-warning" th:if="${tempMessage != null && badgeToShow == 'warning'}">[[${tempMessage}]]</span>
+    <span class="font-weight-bold badge badge-success" th:if="${tempMessage != null && badgeToShow == 'success'}">[[${tempMessage}]]</span>
+</div>
+
 <div class="container-fluid border rounded shadow">
     <canvas id="myChart"></canvas>
 </div>
