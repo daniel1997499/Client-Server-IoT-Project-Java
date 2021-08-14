@@ -27,7 +27,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         auth
                 .inMemoryAuthentication()
                 .withUser("user")  // #1
-                .password("{noop}1q2w3e4r5t6y")
+                .password("{noop}password")
                 .roles("USER")
                 .and()
                 .withUser("admin") // #2
@@ -40,6 +40,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         web
                 .ignoring()
                 .antMatchers("/resources/**") // #3
+                .antMatchers("/resources/static/**")
                 .antMatchers("/api/**");
     }
 
@@ -50,8 +51,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 //                .antMatchers("/api/").permitAll() // #4
                 .antMatchers("/h2-console/**").hasRole("ADMIN") // #6
                 .anyRequest().authenticated() // 7
-                .and().csrf().ignoringAntMatchers("/h2-console/**")//don't apply CSRF protection to /h2-console
-                .and().headers().frameOptions().sameOrigin()//allow use of frame to same origin urls
                 .and()
                 .formLogin()  // #8
 //                .loginPage("/login") // #9
