@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>All Sensor Data Line Chart</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script> <!--chart stuff-->
+</head>
+<body class="changeableBg">
+<span id="bgColorDiv" class="d-none" th:text="${appContext?.globalColor}"/>
+
+<header th:insert="fragments/topnavbar.html :: headernavbar"> </header>
+
+<div>
+    <span class="font-weight-bold badge badge-danger" th:if="${tempMessage != null && badgeToShow == 'danger'}">[[${tempMessage}]]</span>
+    <span class="font-weight-bold badge badge-warning" th:if="${tempMessage != null && badgeToShow == 'warning'}">[[${tempMessage}]]</span>
+    <span class="font-weight-bold badge badge-success" th:if="${tempMessage != null && badgeToShow == 'success'}">[[${tempMessage}]]</span>
+</div>
+
+<div class="container-fluid border rounded shadow">
+    <canvas id="myChart"></canvas>
+</div>
+
+<span id="dataForChartDiv" class="d-none" th:text=${chartData}></span>
+<span id="datesForChartDiv" class="d-none" th:text=${chartDates}></span>
+<div  class="mb-5"></div>
+
+<script>
+    $(document).ready(function() { //parse data from span above and transform string into js array
+        //change bg to globalColor value
+        var tmpBgColor = $("#bgColorDiv").text();
+        finalBgColor = "bg-" + tmpBgColor.toLowerCase();
+
+        var elements = document.getElementsByClassName("changeableBg");
+        for(let i=0; i< elements.length; i+=1) {
+            elements.item(i).classList.toggle(finalBgColor);
+        }
+        //chart data
+        var dataForChartArrayAsString = $("#dataForChartDiv").text();
+        var cutDataForChartArrayAsString = dataForChartArrayAsString.substring(1, dataForChartArrayAsString.length - 1);
+        var finalDataArray = cutDataForChartArrayAsString.split(',').map(i=>Number(i));
+
+        var datesForChartArrayAsString = $("#datesForChartDiv").text();
+        var cutDatesForChartArrayAsString = datesForChartArrayAsString.substring(1, datesForChartArrayAsString.length - 1);
+        var finalDatesArray = cutDatesForChartArrayAsString.split(','); //.map(i=>i.replace(":", ".")).map(i=>Number(i));
+
+        var chartDiv = document.getElementById("myChart").getContext('2d');
+        var myChart = new Chart(chartDiv, {
+          type: 'line',
+          data: {
+            labels: finalDatesArray,
+            datasets: [
+              {
+                label: 'Temperature',
+                fill: false,
+                borderColor: 'rgb(75, 192, 192)',
+                tension: 0.1,
+                data: finalDataArray
+              }
+            ]
+          }
+        });
+    });
+</script>
+
+</body>
+</html>
